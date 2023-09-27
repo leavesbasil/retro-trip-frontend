@@ -5,6 +5,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:grpc/grpc.dart';
 import 'package:provider/provider.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
+import 'package:retro_trip/src/input.dart';
 
 void main() {
   runApp(const RetroTripApp());
@@ -19,22 +20,7 @@ class RetroTripApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorSchemeSeed: const Color(0xff6750a4),
         useMaterial3: true,
       ),
       home: Provider<grpc.TripClient>(
@@ -153,50 +139,41 @@ class TripPage extends StatelessWidget {
                 )
               ],
             ),
-            body: const CardList(),
-            floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                context.read<TripModel>().generate();
-              },
-              child: const Icon(Icons.add),
-            ),
-          );
+            body: CustomScrollView(
+                physics: const BouncingScrollPhysics(),
+                slivers: [
+                  Consumer<TripModel>(builder: (_, trip, ___) {
+                    return SliverList(
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                      return Slidable(
+                        endActionPane: ActionPane(
+                          motion: const ScrollMotion(),
+                          children: [
+                            SlidableAction(
+                              // An action can be bigger than the others.
+                              flex: 2,
+                              onPressed: (context) {
+                                trip.delete(trip.element(index).cardId);
+                              },
+                              backgroundColor: const Color(0xFFFE4A49),
+                              foregroundColor: Colors.white,
+                              icon: Icons.delete,
+                              label: 'Delete',
+                            )
+                          ],
+                        ),
+                        child: ListItem(trip, index),
+                      );
+                    }, childCount: trip.length));
+                  })
+                ]),
+            resizeToAvoidBottomInset: false,
+            bottomNavigationBar: BottomAppBar(
+              height: 100 + MediaQuery.of(context).viewInsets.bottom,
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: const InputForm(),
+            ));
         });
-  }
-}
-
-class CardList extends StatelessWidget {
-  const CardList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<TripModel>(builder: (_, trip, ___) {
-      return ListView.separated(
-        itemCount: trip.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Slidable(
-            endActionPane: ActionPane(
-              motion: const ScrollMotion(),
-              children: [
-                SlidableAction(
-                  // An action can be bigger than the others.
-                  flex: 2,
-                  onPressed: (context) {
-                    trip.delete(trip.element(index).cardId);
-                  },
-                  backgroundColor: const Color(0xFFFE4A49),
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
-                  label: 'Delete',
-                )
-              ],
-            ),
-            child: ListItem(trip, index),
-          );
-        },
-        separatorBuilder: (BuildContext context, int index) => const Divider(),
-      );
-    });
   }
 }
 
@@ -249,6 +226,10 @@ class TripModel extends ChangeNotifier {
     stub.updateCard(
         grpc.UpdateCardRequest(tripId: tripId, cardId: cardId, text: text));
   }
+
+  void add(String text) {
+    stub.createCard(grpc.CreateCardRequest(tripId: tripId, text: text));
+  }
 }
 
 class TripClientFactory {
@@ -274,10 +255,10 @@ class ListItem extends StatefulWidget {
   ListItem(this.model, this.index, {super.key});
 
   @override
-  _ListItemState createState() => _ListItemState();
+  ListItemState createState() => ListItemState();
 }
 
-class _ListItemState extends State<ListItem> {
+class ListItemState extends State<ListItem> {
   bool _isEditingMode = false;
   late TextEditingController _editController;
   late TripModel _trip;
@@ -292,11 +273,13 @@ class _ListItemState extends State<ListItem> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: titleWidget,
-      subtitle: Text('Rating: ${_trip.element(_index).voiceCount}'),
-      trailing: tralingButton,
-      onLongPress: _toggleMode,
+    return Card(
+      child: ListTile(
+        title: titleWidget,
+        subtitle: Text('Rating: ${_trip.element(_index).voiceCount}'),
+        trailing: tralingButton,
+        onLongPress: _toggleMode,
+      ),
     );
   }
 
