@@ -112,68 +112,111 @@ class _StartPageState extends State<StartPage> {
   }
 }
 
-class TripPage extends StatelessWidget {
+class TripPage extends StatefulWidget {
   final String id;
   final grpc.TripClient client;
 
   const TripPage(this.id, this.client, {super.key});
 
   @override
+  State<TripPage> createState() => _TripPageState();
+}
+
+class _TripPageState extends State<TripPage> {
+  GlobalKey<SliverReorderableListState> listKey =
+      GlobalKey<SliverReorderableListState>();
+
+  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => TripModel.create(client, id),
+        create: (_) => TripModel.create(widget.client, widget.id),
         builder: (context, child) {
           return Scaffold(
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: Text(id),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.copy),
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: id));
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content:
-                            Text("Идентификатор ретро скопирован в буфер")));
-                  },
-                )
-              ],
-            ),
-            body: CustomScrollView(
-                physics: const BouncingScrollPhysics(),
-                slivers: [
-                  Consumer<TripModel>(builder: (_, trip, ___) {
-                    return SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                      return Slidable(
-                        endActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          children: [
-                            SlidableAction(
-                              // An action can be bigger than the others.
-                              flex: 2,
-                              onPressed: (context) {
-                                trip.delete(trip.element(index).cardId);
-                              },
-                              backgroundColor: const Color(0xFFFE4A49),
-                              foregroundColor: Colors.white,
-                              icon: Icons.delete,
-                              label: 'Delete',
-                            )
-                          ],
-                        ),
-                        child: ListItem(trip, index),
+              appBar: AppBar(
+                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                title: Text(widget.id),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: widget.id));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content:
+                              Text("Идентификатор ретро скопирован в буфер")));
+                    },
+                  )
+                ],
+              ),
+              body: CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    Consumer<TripModel>(builder: (_, trip, ___) {
+                      return SliverReorderableList(
+                        key: listKey,
+                        itemBuilder: (context, index) {
+                          return Slidable(
+                            key: Key('$index'),
+                            endActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  // An action can be bigger than the others.
+                                  flex: 2,
+                                  icon: Icons.delete,
+                                  onPressed: (context) {
+                                    trip.delete(trip.element(index).cardId);
+                                  },
+                                  backgroundColor: const Color(0xFFFE4A49),
+                                  foregroundColor: Colors.white,
+                                ),
+                                SlidableAction(
+                                  flex: 2,
+                                  icon: Icons.thumb_up,
+                                  onPressed: (context) {
+                                    trip.like(trip.element(index).cardId);
+                                  },
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                ),
+                                SlidableAction(
+                                  flex: 2,
+                                  icon: Icons.thumb_down,
+                                  onPressed: (context) {
+                                    trip.dislike(trip.element(index).cardId);
+                                  },
+                                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                                  foregroundColor: Colors.white,
+                                )
+                              ],
+                            ),
+                            child: ListItem(trip, index),
+                          );
+                        },
+                        itemCount: trip.length,
+                        onReorder: (int oldIndex, int newIndex) {
+                          setState(() {
+                            if (oldIndex < newIndex) {
+                              newIndex -= 1;
+                            }
+                            var item = trip.cards.removeAt(oldIndex);
+                            trip.cards.insert(newIndex, item);
+                          });
+                        },
                       );
-                    }, childCount: trip.length));
-                  })
-                ]),
-            resizeToAvoidBottomInset: false,
-            bottomNavigationBar: BottomAppBar(
-              height: 100 + MediaQuery.of(context).viewInsets.bottom,
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: const InputForm(),
-            ));
+                    })
+                  ]),
+              resizeToAvoidBottomInset: false,
+              bottomNavigationBar: BottomAppBar(
+                height: 100 + MediaQuery.of(context).viewInsets.bottom,
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: const InputForm(),
+              ));
         });
+  }
+
+  void _stop() {
+    listKey.currentState!.cancelReorder();
   }
 }
 
@@ -275,9 +318,10 @@ class ListItemState extends State<ListItem> {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
+        leading: const CircleAvatar(),
         title: titleWidget,
         subtitle: Text('Rating: ${_trip.element(_index).voiceCount}'),
-        trailing: tralingButton,
+        trailing: trailingButton,
         onLongPress: _toggleMode,
       ),
     );
@@ -294,7 +338,7 @@ class ListItemState extends State<ListItem> {
     }
   }
 
-  Widget get tralingButton {
+  Widget get trailingButton {
     if (_isEditingMode) {
       return IconButton(
         icon: const Icon(Icons.check),
@@ -304,22 +348,10 @@ class ListItemState extends State<ListItem> {
         },
       );
     } else {
-      return Row(mainAxisSize: MainAxisSize.min, children: [
-        IconButton(
-          icon: const Icon(Icons.thumb_up),
-          tooltip: 'Like',
-          onPressed: () {
-            _trip.like(_trip.element(_index).cardId);
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.thumb_down),
-          tooltip: 'Dislike',
-          onPressed: () {
-            _trip.dislike(_trip.element(_index).cardId);
-          },
-        ),
-      ]);
+      return ReorderableDragStartListener(
+        index: _index,
+        child: const Icon(Icons.drag_indicator),
+      );
     }
   }
 
