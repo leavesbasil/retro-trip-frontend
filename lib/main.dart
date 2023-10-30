@@ -1,11 +1,11 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:grpc/grpc.dart';
 import 'package:provider/provider.dart';
+import 'package:retro_trip/input.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
-import 'package:retro_trip/src/input.dart';
+
+import 'card.dart';
+import 'model.dart';
 
 void main() {
   runApp(const RetroTripApp());
@@ -112,34 +112,26 @@ class _StartPageState extends State<StartPage> {
   }
 }
 
-class TripPage extends StatefulWidget {
+class TripPage extends StatelessWidget {
   final String id;
   final grpc.TripClient client;
 
   const TripPage(this.id, this.client, {super.key});
 
   @override
-  State<TripPage> createState() => _TripPageState();
-}
-
-class _TripPageState extends State<TripPage> {
-  GlobalKey<SliverReorderableListState> listKey =
-      GlobalKey<SliverReorderableListState>();
-
-  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => TripModel.create(widget.client, widget.id),
+        create: (_) => TripModel.create(client, id),
         builder: (context, child) {
           return Scaffold(
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                title: Text(widget.id),
+                title: Text(id),
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.copy),
                     onPressed: () {
-                      Clipboard.setData(ClipboardData(text: widget.id));
+                      Clipboard.setData(ClipboardData(text: id));
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content:
                               Text("Идентификатор ретро скопирован в буфер")));
@@ -151,58 +143,60 @@ class _TripPageState extends State<TripPage> {
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     Consumer<TripModel>(builder: (_, trip, ___) {
-                      return SliverReorderableList(
-                        key: listKey,
-                        itemBuilder: (context, index) {
-                          return Slidable(
-                            key: Key('$index'),
-                            endActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                SlidableAction(
-                                  // An action can be bigger than the others.
-                                  flex: 2,
-                                  icon: Icons.delete,
-                                  onPressed: (context) {
-                                    trip.delete(trip.element(index).cardId);
-                                  },
-                                  backgroundColor: const Color(0xFFFE4A49),
-                                  foregroundColor: Colors.white,
-                                ),
-                                SlidableAction(
-                                  flex: 2,
-                                  icon: Icons.thumb_up,
-                                  onPressed: (context) {
-                                    trip.like(trip.element(index).cardId);
-                                  },
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
-                                  foregroundColor: Colors.white,
-                                ),
-                                SlidableAction(
-                                  flex: 2,
-                                  icon: Icons.thumb_down,
-                                  onPressed: (context) {
-                                    trip.dislike(trip.element(index).cardId);
-                                  },
-                                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                                  foregroundColor: Colors.white,
-                                )
-                              ],
-                            ),
-                            child: ListItem(trip, index),
+                      return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return HierarchicalItem(
+                            card: trip.cards[index],
+                            builder: (context, card) {
+                              return DraggableItem(
+                                card: card,
+                                child: CardItem(card),
+                              );
+                            },
                           );
+
+                          // return Slidable(
+                          //   endActionPane: ActionPane(
+                          //     motion: const ScrollMotion(),
+                          //     children: [
+                          //       SlidableAction(
+                          //         // An action can be bigger than the others.
+                          //         flex: 2,
+                          //         icon: Icons.delete,
+                          //         onPressed: (context) {
+                          //           trip.delete(trip.element(index).cardId);
+                          //         },
+                          //         backgroundColor: const Color(0xFFFE4A49),
+                          //         foregroundColor: Colors.white,
+                          //       ),
+                          //       SlidableAction(
+                          //         flex: 2,
+                          //         icon: Icons.thumb_up,
+                          //         onPressed: (context) {
+                          //           trip.like(trip.element(index).cardId);
+                          //         },
+                          //         backgroundColor:
+                          //             Theme.of(context).colorScheme.primary,
+                          //         foregroundColor: Colors.white,
+                          //       ),
+                          //       SlidableAction(
+                          //         flex: 2,
+                          //         icon: Icons.thumb_down,
+                          //         onPressed: (context) {
+                          //           trip.dislike(trip.element(index).cardId);
+                          //         },
+                          //         backgroundColor:
+                          //             Theme.of(context).colorScheme.secondary,
+                          //         foregroundColor: Colors.white,
+                          //       )
+                          //     ],
+                          //   ),
+                          //   child: DraggableItem(card: card, child: Text(card.text)),
+                          // );
                         },
-                        itemCount: trip.length,
-                        onReorder: (int oldIndex, int newIndex) {
-                          setState(() {
-                            if (oldIndex < newIndex) {
-                              newIndex -= 1;
-                            }
-                            var item = trip.cards.removeAt(oldIndex);
-                            trip.cards.insert(newIndex, item);
-                          });
-                        },
-                      );
+                        childCount: trip.length,
+                      ));
                     })
                   ]),
               resizeToAvoidBottomInset: false,
@@ -213,151 +207,5 @@ class _TripPageState extends State<TripPage> {
                 child: const InputForm(),
               ));
         });
-  }
-
-  void _stop() {
-    listKey.currentState!.cancelReorder();
-  }
-}
-
-class TripModel extends ChangeNotifier {
-  List<grpc.Card> cards = [];
-
-  final grpc.TripClient stub;
-  final String tripId;
-
-  TripModel(this.stub, this.tripId);
-
-  get length => cards.length;
-
-  grpc.Card element(index) => cards.elementAt(index);
-
-  factory TripModel.create(grpc.TripClient client, String id) {
-    var result = TripModel(client, id);
-    result.init();
-    return result;
-  }
-
-  Future<void> init() async {
-    await for (var trip
-        in stub.tripStreaming(grpc.TripStreamingRequest(tripId: tripId))) {
-      cards = trip.card;
-      notifyListeners();
-    }
-  }
-
-  void generate() async {
-    stub.createCard(grpc.CreateCardRequest(
-        tripId: tripId, text: WordPair.random().join(" ")));
-  }
-
-  void like(String cardId) {
-    stub.cardAction(
-        grpc.CardActionRequest(tripId: tripId, cardId: cardId, like: true));
-  }
-
-  void dislike(String cardId) {
-    stub.cardAction(
-        grpc.CardActionRequest(tripId: tripId, cardId: cardId, dislike: true));
-  }
-
-  void delete(String cardId) {
-    stub.deleteCard(grpc.DeleteCardRequest(tripId: tripId, cardId: cardId));
-  }
-
-  void updateText(String cardId, String text) {
-    stub.updateCard(
-        grpc.UpdateCardRequest(tripId: tripId, cardId: cardId, text: text));
-  }
-
-  void add(String text) {
-    stub.createCard(grpc.CreateCardRequest(tripId: tripId, text: text));
-  }
-}
-
-class TripClientFactory {
-  static grpc.TripClient create() {
-    final channel = ClientChannel(
-      '192.168.1.106',
-      port: 9090,
-      options: ChannelOptions(
-        credentials: ChannelCredentials.insecure(),
-        codecRegistry:
-            CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
-      ),
-    );
-    final stub = grpc.TripClient(channel);
-    return stub;
-  }
-}
-
-class ListItem extends StatefulWidget {
-  TripModel model;
-  int index;
-
-  ListItem(this.model, this.index, {super.key});
-
-  @override
-  ListItemState createState() => ListItemState();
-}
-
-class ListItemState extends State<ListItem> {
-  bool _isEditingMode = false;
-  late TextEditingController _editController;
-  late TripModel _trip;
-  late int _index;
-
-  @override
-  void initState() {
-    super.initState();
-    _trip = widget.model;
-    _index = widget.index;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: const CircleAvatar(),
-        title: titleWidget,
-        subtitle: Text('Rating: ${_trip.element(_index).voiceCount}'),
-        trailing: trailingButton,
-        onLongPress: _toggleMode,
-      ),
-    );
-  }
-
-  Widget get titleWidget {
-    if (_isEditingMode) {
-      _editController = TextEditingController(text: _trip.element(_index).text);
-      return TextField(
-        controller: _editController,
-      );
-    } else {
-      return Text(_trip.element(_index).text);
-    }
-  }
-
-  Widget get trailingButton {
-    if (_isEditingMode) {
-      return IconButton(
-        icon: const Icon(Icons.check),
-        onPressed: () {
-          _trip.updateText(_trip.element(_index).cardId, _editController.text);
-          _toggleMode();
-        },
-      );
-    } else {
-      return ReorderableDragStartListener(
-        index: _index,
-        child: const Icon(Icons.drag_indicator),
-      );
-    }
-  }
-
-  void _toggleMode() {
-    setState(() {
-      _isEditingMode = !_isEditingMode;
-    });
   }
 }

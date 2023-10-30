@@ -221,27 +221,37 @@ class TripStreamingReply extends $pb.GeneratedMessage {
 
 class Card extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Card', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'retro.api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cardId', protoName: 'cardId')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'text')
-    ..a<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'voiceCount', $pb.PbFieldType.O3, protoName: 'voiceCount')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'path')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'id')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'text')
+    ..a<$core.int>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'voiceCount', $pb.PbFieldType.O3, protoName: 'voiceCount')
+    ..pc<Card>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'children', $pb.PbFieldType.PM, subBuilder: Card.create)
     ..hasRequiredFields = false
   ;
 
   Card._() : super();
   factory Card({
-    $core.String? cardId,
+    $core.String? path,
+    $core.String? id,
     $core.String? text,
     $core.int? voiceCount,
+    $core.Iterable<Card>? children,
   }) {
     final _result = create();
-    if (cardId != null) {
-      _result.cardId = cardId;
+    if (path != null) {
+      _result.path = path;
+    }
+    if (id != null) {
+      _result.id = id;
     }
     if (text != null) {
       _result.text = text;
     }
     if (voiceCount != null) {
       _result.voiceCount = voiceCount;
+    }
+    if (children != null) {
+      _result.children.addAll(children);
     }
     return _result;
   }
@@ -267,31 +277,43 @@ class Card extends $pb.GeneratedMessage {
   static Card? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cardId => $_getSZ(0);
+  $core.String get path => $_getSZ(0);
   @$pb.TagNumber(1)
-  set cardId($core.String v) { $_setString(0, v); }
+  set path($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCardId() => $_has(0);
+  $core.bool hasPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCardId() => clearField(1);
+  void clearPath() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get text => $_getSZ(1);
+  $core.String get id => $_getSZ(1);
   @$pb.TagNumber(2)
-  set text($core.String v) { $_setString(1, v); }
+  set id($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasText() => $_has(1);
+  $core.bool hasId() => $_has(1);
   @$pb.TagNumber(2)
-  void clearText() => clearField(2);
+  void clearId() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.int get voiceCount => $_getIZ(2);
+  $core.String get text => $_getSZ(2);
   @$pb.TagNumber(3)
-  set voiceCount($core.int v) { $_setSignedInt32(2, v); }
+  set text($core.String v) { $_setString(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasVoiceCount() => $_has(2);
+  $core.bool hasText() => $_has(2);
   @$pb.TagNumber(3)
-  void clearVoiceCount() => clearField(3);
+  void clearText() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.int get voiceCount => $_getIZ(3);
+  @$pb.TagNumber(4)
+  set voiceCount($core.int v) { $_setSignedInt32(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasVoiceCount() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearVoiceCount() => clearField(4);
+
+  @$pb.TagNumber(5)
+  $core.List<Card> get children => $_getList(4);
 }
 
 class CreateCardRequest extends $pb.GeneratedMessage {
@@ -700,32 +722,150 @@ class UpdateCardRequest extends $pb.GeneratedMessage {
   void clearText() => clearField(3);
 }
 
-class UpdateCardReplay extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UpdateCardReplay', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'retro.api.v1'), createEmptyInstance: create)
+class UpdateCardReply extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'UpdateCardReply', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'retro.api.v1'), createEmptyInstance: create)
     ..hasRequiredFields = false
   ;
 
-  UpdateCardReplay._() : super();
-  factory UpdateCardReplay() => create();
-  factory UpdateCardReplay.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory UpdateCardReplay.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  UpdateCardReply._() : super();
+  factory UpdateCardReply() => create();
+  factory UpdateCardReply.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory UpdateCardReply.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  UpdateCardReplay clone() => UpdateCardReplay()..mergeFromMessage(this);
+  UpdateCardReply clone() => UpdateCardReply()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  UpdateCardReplay copyWith(void Function(UpdateCardReplay) updates) => super.copyWith((message) => updates(message as UpdateCardReplay)) as UpdateCardReplay; // ignore: deprecated_member_use
+  UpdateCardReply copyWith(void Function(UpdateCardReply) updates) => super.copyWith((message) => updates(message as UpdateCardReply)) as UpdateCardReply; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static UpdateCardReplay create() => UpdateCardReplay._();
-  UpdateCardReplay createEmptyInstance() => create();
-  static $pb.PbList<UpdateCardReplay> createRepeated() => $pb.PbList<UpdateCardReplay>();
+  static UpdateCardReply create() => UpdateCardReply._();
+  UpdateCardReply createEmptyInstance() => create();
+  static $pb.PbList<UpdateCardReply> createRepeated() => $pb.PbList<UpdateCardReply>();
   @$core.pragma('dart2js:noInline')
-  static UpdateCardReplay getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UpdateCardReplay>(create);
-  static UpdateCardReplay? _defaultInstance;
+  static UpdateCardReply getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<UpdateCardReply>(create);
+  static UpdateCardReply? _defaultInstance;
+}
+
+class MoveCardRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'MoveCardRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'retro.api.v1'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'tripId', protoName: 'tripId')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cardId', protoName: 'cardId')
+    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'from')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'to')
+    ..hasRequiredFields = false
+  ;
+
+  MoveCardRequest._() : super();
+  factory MoveCardRequest({
+    $core.String? tripId,
+    $core.String? cardId,
+    $core.String? from,
+    $core.String? to,
+  }) {
+    final _result = create();
+    if (tripId != null) {
+      _result.tripId = tripId;
+    }
+    if (cardId != null) {
+      _result.cardId = cardId;
+    }
+    if (from != null) {
+      _result.from = from;
+    }
+    if (to != null) {
+      _result.to = to;
+    }
+    return _result;
+  }
+  factory MoveCardRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory MoveCardRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  MoveCardRequest clone() => MoveCardRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  MoveCardRequest copyWith(void Function(MoveCardRequest) updates) => super.copyWith((message) => updates(message as MoveCardRequest)) as MoveCardRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static MoveCardRequest create() => MoveCardRequest._();
+  MoveCardRequest createEmptyInstance() => create();
+  static $pb.PbList<MoveCardRequest> createRepeated() => $pb.PbList<MoveCardRequest>();
+  @$core.pragma('dart2js:noInline')
+  static MoveCardRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MoveCardRequest>(create);
+  static MoveCardRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get tripId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set tripId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTripId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTripId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get cardId => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set cardId($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasCardId() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearCardId() => clearField(2);
+
+  @$pb.TagNumber(3)
+  $core.String get from => $_getSZ(2);
+  @$pb.TagNumber(3)
+  set from($core.String v) { $_setString(2, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasFrom() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearFrom() => clearField(3);
+
+  @$pb.TagNumber(4)
+  $core.String get to => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set to($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasTo() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearTo() => clearField(4);
+}
+
+class MoveCardReply extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'MoveCardReply', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'retro.api.v1'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  MoveCardReply._() : super();
+  factory MoveCardReply() => create();
+  factory MoveCardReply.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory MoveCardReply.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  MoveCardReply clone() => MoveCardReply()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  MoveCardReply copyWith(void Function(MoveCardReply) updates) => super.copyWith((message) => updates(message as MoveCardReply)) as MoveCardReply; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static MoveCardReply create() => MoveCardReply._();
+  MoveCardReply createEmptyInstance() => create();
+  static $pb.PbList<MoveCardReply> createRepeated() => $pb.PbList<MoveCardReply>();
+  @$core.pragma('dart2js:noInline')
+  static MoveCardReply getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<MoveCardReply>(create);
+  static MoveCardReply? _defaultInstance;
 }
 

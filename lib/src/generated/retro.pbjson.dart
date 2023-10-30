@@ -54,14 +54,16 @@ final $typed_data.Uint8List tripStreamingReplyDescriptor = $convert.base64Decode
 const Card$json = const {
   '1': 'Card',
   '2': const [
-    const {'1': 'cardId', '3': 1, '4': 1, '5': 9, '10': 'cardId'},
-    const {'1': 'text', '3': 2, '4': 1, '5': 9, '10': 'text'},
-    const {'1': 'voiceCount', '3': 3, '4': 1, '5': 5, '10': 'voiceCount'},
+    const {'1': 'path', '3': 1, '4': 1, '5': 9, '10': 'path'},
+    const {'1': 'id', '3': 2, '4': 1, '5': 9, '10': 'id'},
+    const {'1': 'text', '3': 3, '4': 1, '5': 9, '10': 'text'},
+    const {'1': 'voiceCount', '3': 4, '4': 1, '5': 5, '10': 'voiceCount'},
+    const {'1': 'children', '3': 5, '4': 3, '5': 11, '6': '.retro.api.v1.Card', '10': 'children'},
   ],
 };
 
 /// Descriptor for `Card`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List cardDescriptor = $convert.base64Decode('CgRDYXJkEhYKBmNhcmRJZBgBIAEoCVIGY2FyZElkEhIKBHRleHQYAiABKAlSBHRleHQSHgoKdm9pY2VDb3VudBgDIAEoBVIKdm9pY2VDb3VudA==');
+final $typed_data.Uint8List cardDescriptor = $convert.base64Decode('CgRDYXJkEhIKBHBhdGgYASABKAlSBHBhdGgSDgoCaWQYAiABKAlSAmlkEhIKBHRleHQYAyABKAlSBHRleHQSHgoKdm9pY2VDb3VudBgEIAEoBVIKdm9pY2VDb3VudBIuCghjaGlsZHJlbhgFIAMoCzISLnJldHJvLmFwaS52MS5DYXJkUghjaGlsZHJlbg==');
 @$core.Deprecated('Use createCardRequestDescriptor instead')
 const CreateCardRequest$json = const {
   '1': 'CreateCardRequest',
@@ -136,10 +138,30 @@ const UpdateCardRequest$json = const {
 
 /// Descriptor for `UpdateCardRequest`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List updateCardRequestDescriptor = $convert.base64Decode('ChFVcGRhdGVDYXJkUmVxdWVzdBIWCgZ0cmlwSWQYASABKAlSBnRyaXBJZBIWCgZjYXJkSWQYAiABKAlSBmNhcmRJZBISCgR0ZXh0GAMgASgJUgR0ZXh0');
-@$core.Deprecated('Use updateCardReplayDescriptor instead')
-const UpdateCardReplay$json = const {
-  '1': 'UpdateCardReplay',
+@$core.Deprecated('Use updateCardReplyDescriptor instead')
+const UpdateCardReply$json = const {
+  '1': 'UpdateCardReply',
 };
 
-/// Descriptor for `UpdateCardReplay`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List updateCardReplayDescriptor = $convert.base64Decode('ChBVcGRhdGVDYXJkUmVwbGF5');
+/// Descriptor for `UpdateCardReply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List updateCardReplyDescriptor = $convert.base64Decode('Cg9VcGRhdGVDYXJkUmVwbHk=');
+@$core.Deprecated('Use moveCardRequestDescriptor instead')
+const MoveCardRequest$json = const {
+  '1': 'MoveCardRequest',
+  '2': const [
+    const {'1': 'tripId', '3': 1, '4': 1, '5': 9, '10': 'tripId'},
+    const {'1': 'cardId', '3': 2, '4': 1, '5': 9, '10': 'cardId'},
+    const {'1': 'from', '3': 3, '4': 1, '5': 9, '10': 'from'},
+    const {'1': 'to', '3': 4, '4': 1, '5': 9, '10': 'to'},
+  ],
+};
+
+/// Descriptor for `MoveCardRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List moveCardRequestDescriptor = $convert.base64Decode('Cg9Nb3ZlQ2FyZFJlcXVlc3QSFgoGdHJpcElkGAEgASgJUgZ0cmlwSWQSFgoGY2FyZElkGAIgASgJUgZjYXJkSWQSEgoEZnJvbRgDIAEoCVIEZnJvbRIOCgJ0bxgEIAEoCVICdG8=');
+@$core.Deprecated('Use moveCardReplyDescriptor instead')
+const MoveCardReply$json = const {
+  '1': 'MoveCardReply',
+};
+
+/// Descriptor for `MoveCardReply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List moveCardReplyDescriptor = $convert.base64Decode('Cg1Nb3ZlQ2FyZFJlcGx5');

@@ -39,17 +39,22 @@ class TripClient extends $grpc.Client {
           ($core.List<$core.int> value) =>
               $0.DeleteCardReply.fromBuffer(value));
   static final _$updateCard =
-      $grpc.ClientMethod<$0.UpdateCardRequest, $0.UpdateCardReplay>(
+      $grpc.ClientMethod<$0.UpdateCardRequest, $0.UpdateCardReply>(
           '/retro.api.v1.Trip/UpdateCard',
           ($0.UpdateCardRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) =>
-              $0.UpdateCardReplay.fromBuffer(value));
+              $0.UpdateCardReply.fromBuffer(value));
   static final _$cardAction =
       $grpc.ClientMethod<$0.CardActionRequest, $0.CardActionReply>(
           '/retro.api.v1.Trip/CardAction',
           ($0.CardActionRequest value) => value.writeToBuffer(),
           ($core.List<$core.int> value) =>
               $0.CardActionReply.fromBuffer(value));
+  static final _$moveCard =
+      $grpc.ClientMethod<$0.MoveCardRequest, $0.MoveCardReply>(
+          '/retro.api.v1.Trip/MoveCard',
+          ($0.MoveCardRequest value) => value.writeToBuffer(),
+          ($core.List<$core.int> value) => $0.MoveCardReply.fromBuffer(value));
 
   TripClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -82,7 +87,7 @@ class TripClient extends $grpc.Client {
     return $createUnaryCall(_$deleteCard, request, options: options);
   }
 
-  $grpc.ResponseFuture<$0.UpdateCardReplay> updateCard(
+  $grpc.ResponseFuture<$0.UpdateCardReply> updateCard(
       $0.UpdateCardRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$updateCard, request, options: options);
@@ -92,6 +97,11 @@ class TripClient extends $grpc.Client {
       $0.CardActionRequest request,
       {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$cardAction, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.MoveCardReply> moveCard($0.MoveCardRequest request,
+      {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$moveCard, request, options: options);
   }
 }
 
@@ -129,13 +139,13 @@ abstract class TripServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.DeleteCardRequest.fromBuffer(value),
         ($0.DeleteCardReply value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.UpdateCardRequest, $0.UpdateCardReplay>(
+    $addMethod($grpc.ServiceMethod<$0.UpdateCardRequest, $0.UpdateCardReply>(
         'UpdateCard',
         updateCard_Pre,
         false,
         false,
         ($core.List<$core.int> value) => $0.UpdateCardRequest.fromBuffer(value),
-        ($0.UpdateCardReplay value) => value.writeToBuffer()));
+        ($0.UpdateCardReply value) => value.writeToBuffer()));
     $addMethod($grpc.ServiceMethod<$0.CardActionRequest, $0.CardActionReply>(
         'CardAction',
         cardAction_Pre,
@@ -143,6 +153,13 @@ abstract class TripServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.CardActionRequest.fromBuffer(value),
         ($0.CardActionReply value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.MoveCardRequest, $0.MoveCardReply>(
+        'MoveCard',
+        moveCard_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.MoveCardRequest.fromBuffer(value),
+        ($0.MoveCardReply value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.CreateTripReply> createTrip_Pre($grpc.ServiceCall call,
@@ -165,7 +182,7 @@ abstract class TripServiceBase extends $grpc.Service {
     return deleteCard(call, await request);
   }
 
-  $async.Future<$0.UpdateCardReplay> updateCard_Pre($grpc.ServiceCall call,
+  $async.Future<$0.UpdateCardReply> updateCard_Pre($grpc.ServiceCall call,
       $async.Future<$0.UpdateCardRequest> request) async {
     return updateCard(call, await request);
   }
@@ -173,6 +190,11 @@ abstract class TripServiceBase extends $grpc.Service {
   $async.Future<$0.CardActionReply> cardAction_Pre($grpc.ServiceCall call,
       $async.Future<$0.CardActionRequest> request) async {
     return cardAction(call, await request);
+  }
+
+  $async.Future<$0.MoveCardReply> moveCard_Pre(
+      $grpc.ServiceCall call, $async.Future<$0.MoveCardRequest> request) async {
+    return moveCard(call, await request);
   }
 
   $async.Future<$0.CreateTripReply> createTrip(
@@ -183,8 +205,10 @@ abstract class TripServiceBase extends $grpc.Service {
       $grpc.ServiceCall call, $0.CreateCardRequest request);
   $async.Future<$0.DeleteCardReply> deleteCard(
       $grpc.ServiceCall call, $0.DeleteCardRequest request);
-  $async.Future<$0.UpdateCardReplay> updateCard(
+  $async.Future<$0.UpdateCardReply> updateCard(
       $grpc.ServiceCall call, $0.UpdateCardRequest request);
   $async.Future<$0.CardActionReply> cardAction(
       $grpc.ServiceCall call, $0.CardActionRequest request);
+  $async.Future<$0.MoveCardReply> moveCard(
+      $grpc.ServiceCall call, $0.MoveCardRequest request);
 }

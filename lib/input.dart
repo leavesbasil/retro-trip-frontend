@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../main.dart';
+import 'model.dart';
 
 class InputForm extends StatefulWidget {
   const InputForm({super.key});
