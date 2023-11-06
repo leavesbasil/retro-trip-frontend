@@ -57,37 +57,72 @@ class _DraggableItemState extends State<DraggableItem> {
         List<dynamic> accepted,
         List<dynamic> rejected,
       ) {
-        return Card(
-          child: ListTile(
-            leading: const CircleAvatar(),
-            selected: _isWillAccept,
-            enabled: !_isDragged,
-            title: widget.child,
-            trailing: _isWillAccept
-                ? const Icon(Icons.add)
-                : Draggable<grpc.Card>(
-                    data: widget.card,
-                    onDragStarted: () {
-                      setState(() {
-                        _isDragged = true;
-                      });
-                    },
-                    onDragUpdate: (_) {},
-                    onDragEnd: (_) {
-                      setState(() {
-                        _isDragged = false;
-                      });
-                    },
-                    feedback: Container(
-                      color: Colors.deepOrange,
-                      height: 50,
-                      width: 50,
-                      child: const Icon(Icons.directions_run),
+        var icon = _isWillAccept
+            ? const Icon(Icons.add)
+            : Draggable<grpc.Card>(
+                data: widget.card,
+                onDragStarted: () {
+                  setState(() {
+                    _isDragged = true;
+                  });
+                },
+                onDragUpdate: (_) {},
+                onDragEnd: (_) {
+                  setState(() {
+                    _isDragged = false;
+                  });
+                },
+                feedback: Opacity(
+                  opacity: 0.8,
+                  child: Card(
+                    elevation: 1,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(2)),
                     ),
-                    child: const Icon(Icons.drag_indicator),
+                    child: SizedBox(
+                      height: 48,
+                      width: 150,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.drag_indicator),
+                            const SizedBox(width: 4.0),
+                            Expanded(
+                                child: Text(widget.card.text,
+                                    overflow: TextOverflow.ellipsis))
+                            // Text(widget.card.text)
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
+                ),
+                childWhenDragging: const Icon(
+                  Icons.drag_indicator,
+                  color: Colors.grey,
+                ),
+                child: const Icon(
+                  Icons.drag_indicator,
+                ),
+              );
+        var card = Card(
+          elevation: 0.1,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(2)),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Row(
+              children: [
+                icon,
+                const SizedBox(width: 4.0),
+                Expanded(child: widget.child)
+              ],
+            ),
           ),
         );
+        return card;
       },
       onWillAccept: (grpc.Card? value) {
         if (value == null) {
@@ -135,9 +170,8 @@ class CardItemState extends State<CardItem> {
         Expanded(
           child: TextField(
             controller: _editController,
-            keyboardType: TextInputType.multiline,
             minLines: 1,
-            maxLines: 10,
+            maxLines: 100,
           ),
         ),
         IconButton(

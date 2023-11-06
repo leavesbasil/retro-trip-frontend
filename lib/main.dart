@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:retro_trip/input.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
@@ -120,6 +121,11 @@ class TripPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final Color oddItemColor = colorScheme.secondary.withOpacity(0.05);
+    final Color evenItemColor = colorScheme.secondary.withOpacity(0.15);
+    final Color draggableItemColor = colorScheme.secondary;
+
     return ChangeNotifierProvider(
         create: (_) => TripModel.create(client, id),
         builder: (context, child) {
@@ -146,54 +152,58 @@ class TripPage extends StatelessWidget {
                       return SliverList(
                           delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          return HierarchicalItem(
-                            card: trip.cards[index],
-                            builder: (context, card) {
-                              return DraggableItem(
-                                card: card,
-                                child: CardItem(card),
-                              );
-                            },
+                          return Container(
+                            color: index.isOdd ? oddItemColor : evenItemColor,
+                            child: HierarchicalItem(
+                              card: trip.cards[index],
+                              builder: (context, card) {
+                                return Slidable(
+                                  endActionPane: ActionPane(
+                                    motion: const ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        // An action can be bigger than the others.
+                                        flex: 2,
+                                        icon: Icons.delete,
+                                        onPressed: (context) {
+                                          trip.delete(card.id);
+                                        },
+                                        backgroundColor:
+                                            const Color(0xFFFE4A49),
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      SlidableAction(
+                                        flex: 2,
+                                        icon: Icons.thumb_up,
+                                        onPressed: (context) {
+                                          trip.like(card.id);
+                                        },
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                      SlidableAction(
+                                        flex: 2,
+                                        icon: Icons.thumb_down,
+                                        onPressed: (context) {
+                                          trip.dislike(card.id);
+                                        },
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        foregroundColor: Colors.white,
+                                      )
+                                    ],
+                                  ),
+                                  child: DraggableItem(
+                                    card: card,
+                                    child: CardItem(card),
+                                  ),
+                                );
+                              },
+                            ),
                           );
-
-                          // return Slidable(
-                          //   endActionPane: ActionPane(
-                          //     motion: const ScrollMotion(),
-                          //     children: [
-                          //       SlidableAction(
-                          //         // An action can be bigger than the others.
-                          //         flex: 2,
-                          //         icon: Icons.delete,
-                          //         onPressed: (context) {
-                          //           trip.delete(trip.element(index).cardId);
-                          //         },
-                          //         backgroundColor: const Color(0xFFFE4A49),
-                          //         foregroundColor: Colors.white,
-                          //       ),
-                          //       SlidableAction(
-                          //         flex: 2,
-                          //         icon: Icons.thumb_up,
-                          //         onPressed: (context) {
-                          //           trip.like(trip.element(index).cardId);
-                          //         },
-                          //         backgroundColor:
-                          //             Theme.of(context).colorScheme.primary,
-                          //         foregroundColor: Colors.white,
-                          //       ),
-                          //       SlidableAction(
-                          //         flex: 2,
-                          //         icon: Icons.thumb_down,
-                          //         onPressed: (context) {
-                          //           trip.dislike(trip.element(index).cardId);
-                          //         },
-                          //         backgroundColor:
-                          //             Theme.of(context).colorScheme.secondary,
-                          //         foregroundColor: Colors.white,
-                          //       )
-                          //     ],
-                          //   ),
-                          //   child: DraggableItem(card: card, child: Text(card.text)),
-                          // );
                         },
                         childCount: trip.length,
                       ));
