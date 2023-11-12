@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
 
@@ -24,7 +25,10 @@ class HierarchicalItem extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 20),
                 child: Column(
                   children: card.children
-                      .map((e) => HierarchicalItem(card: e, builder: builder))
+                      .map((e) => Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: HierarchicalItem(card: e, builder: builder),
+                          ))
                       .toList(),
                 ),
               )
@@ -57,9 +61,8 @@ class _DraggableItemState extends State<DraggableItem> {
         List<dynamic> accepted,
         List<dynamic> rejected,
       ) {
-        var icon = _isWillAccept
-            ? const Icon(Icons.add)
-            : Draggable<grpc.Card>(
+        var icon = context.read<TripModel>().isEditMode()
+            ? Draggable<grpc.Card>(
                 data: widget.card,
                 onDragStarted: () {
                   setState(() {
@@ -72,57 +75,35 @@ class _DraggableItemState extends State<DraggableItem> {
                     _isDragged = false;
                   });
                 },
-                feedback: Opacity(
-                  opacity: 0.8,
-                  child: Card(
-                    elevation: 1,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(2)),
-                    ),
-                    child: SizedBox(
-                      height: 48,
-                      width: 150,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.drag_indicator),
-                            const SizedBox(width: 4.0),
-                            Expanded(
-                                child: Text(widget.card.text,
-                                    overflow: TextOverflow.ellipsis))
-                            // Text(widget.card.text)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                feedback: SizedBox(
+                    width: (MediaQuery.of(context).size.width) - 64,
+                    child: widget.child),
                 childWhenDragging: const Icon(
                   Icons.drag_indicator,
+                  size: 20,
                   color: Colors.grey,
                 ),
                 child: const Icon(
                   Icons.drag_indicator,
+                  size: 20,
                 ),
-              );
-        var card = Card(
-          elevation: 0.1,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(2)),
+              )
+            : const SizedBox();
+        if (_isWillAccept) {
+          icon = const Icon(
+            Icons.add_circle,
+            size: 20,
+          );
+        }
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.black12,
+            borderRadius: BorderRadius.all(Radius.circular(4.0)),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Row(
-              children: [
-                icon,
-                const SizedBox(width: 4.0),
-                Expanded(child: widget.child)
-              ],
-            ),
+          child: Row(
+            children: [icon, Expanded(child: widget.child)],
           ),
         );
-        return card;
       },
       onWillAccept: (grpc.Card? value) {
         if (value == null) {
@@ -149,6 +130,23 @@ class _DraggableItemState extends State<DraggableItem> {
   }
 }
 
+class GroupItem extends StatelessWidget {
+  final Widget child;
+
+  const GroupItem(this.child, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline)),
+      child: child,
+    );
+  }
+}
+
 class CardItem extends StatefulWidget {
   final grpc.Card card;
 
@@ -164,39 +162,164 @@ class CardItemState extends State<CardItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isEditingMode) {
-      _editController = TextEditingController(text: widget.card.text);
-      return Row(children: [
-        Expanded(
-          child: TextField(
-            controller: _editController,
-            minLines: 1,
-            maxLines: 100,
+    return Slidable(
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            // An action can be bigger than the others.
+            flex: 2,
+            icon: Icons.delete,
+            onPressed: (context) {
+              context.read<TripModel>().delete(widget.card.id);
+            },
+            backgroundColor: const Color(0xFFFE4A49),
+            foregroundColor: Colors.white,
           ),
-        ),
-        IconButton(
-            icon: const Icon(Icons.done),
-            onPressed: () {
-              context
-                  .read<TripModel>()
-                  .updateText(widget.card.id, _editController.text);
-              _toggleMode();
-            }),
-      ]);
-    }
-    return Row(children: [
-      Expanded(child: Text(widget.card.text)),
-      IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () {
-            _toggleMode();
-          }),
-    ]);
+        ],
+      ),
+      child:
+          _isEditingMode ? buildEditState(context) : buildCommonState(context),
+    );
   }
 
-  void _toggleMode() {
-    setState(() {
-      _isEditingMode = !_isEditingMode;
-    });
+  Widget buildEditState(BuildContext context) {
+    _editController = TextEditingController(text: widget.card.text);
+    return Stack(
+      alignment: AlignmentDirectional.bottomEnd,
+      children: [
+        TextField(
+          textAlignVertical: TextAlignVertical.top,
+          controller: _editController,
+          minLines: 1,
+          maxLines: 100,
+          decoration: InputDecoration(
+            contentPadding:
+                EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 68.0),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(4))),
+            filled: true,
+            fillColor: Colors.white,
+          ),
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+              left: 8, right: 8, bottom: 8, top: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextButton(
+                child: Text("Cancel"),
+                onPressed: () {
+                  setState(() {
+                    _isEditingMode = false;
+                  });
+                },
+              ),
+              TextButton(
+                child: Text("Save"),
+                onPressed: () {
+                  setState(() {
+                    context.read<TripModel>().updateText(
+                        widget.card.id, _editController.text);
+                    _isEditingMode = false;
+                  });
+                },
+              ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget buildCommonState(BuildContext context) {
+    return Card(
+      elevation: 0.5,
+      margin: EdgeInsets.zero,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+      ),
+      child: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      top: 16.0, left: 16, right: 8, bottom: 8),
+                  child: Text(
+                    widget.card.text,
+                    style: const TextStyle(
+                        fontSize: 16.0, fontWeight: FontWeight.w400),
+                  ),
+                ),
+              ),
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                child: MenuAnchor(
+                  builder: (BuildContext context, MenuController controller,
+                      Widget? child) {
+                    return IconButton(
+                        onPressed: () {
+                          if (controller.isOpen) {
+                            controller.close();
+                          } else {
+                            controller.open();
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.more_vert,
+                          size: 20,
+                        ));
+                  },
+                  menuChildren: [
+                    MenuItemButton(
+                        onPressed: () {
+                          setState(() {
+                            _isEditingMode = true;
+                          });
+                        },
+                        child: const Text("Edit"))
+                  ],
+                ),
+              )
+            ],
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 8, right: 16, bottom: 8, top: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 12,
+                ),
+                SizedBox(width: 8),
+                Text("Owner Name"),
+                Spacer(),
+                IconButton(
+                  icon: Icon(
+                    Icons.thumb_up_alt_outlined,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    context.read<TripModel>().like(widget.card.id);
+                  },
+                ),
+                Text(widget.card.voiceCount.toString())
+              ],
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

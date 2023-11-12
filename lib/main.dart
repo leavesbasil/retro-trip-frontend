@@ -121,101 +121,72 @@ class TripPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final Color oddItemColor = colorScheme.secondary.withOpacity(0.05);
-    final Color evenItemColor = colorScheme.secondary.withOpacity(0.15);
-    final Color draggableItemColor = colorScheme.secondary;
-
     return ChangeNotifierProvider(
         create: (_) => TripModel.create(client, id),
         builder: (context, child) {
-          return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                title: Text(id),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.copy),
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: id));
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content:
-                              Text("Идентификатор ретро скопирован в буфер")));
-                    },
-                  )
-                ],
-              ),
-              body: CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    Consumer<TripModel>(builder: (_, trip, ___) {
-                      return SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          return Container(
-                            color: index.isOdd ? oddItemColor : evenItemColor,
-                            child: HierarchicalItem(
-                              card: trip.cards[index],
+          return Consumer<TripModel>(
+            builder: (_, trip, ___) {
+              return Scaffold(
+                  appBar: AppBar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.inversePrimary,
+                    title: Text(id),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.copy),
+                        onPressed: () {
+                          Clipboard.setData(ClipboardData(text: id));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text(
+                                      "Идентификатор ретро скопирован в буфер")));
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.repeat),
+                        selectedIcon: const Icon(Icons.repeat_on),
+                        isSelected: trip.isEditMode(),
+                        onPressed: () {
+                          trip.switchEditMode();
+                        },
+                      )
+                    ],
+                  ),
+                  body: CustomScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      slivers: [
+                        SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            var data = trip.cards[index];
+                            var item = HierarchicalItem(
+                              card: data,
                               builder: (context, card) {
-                                return Slidable(
-                                  endActionPane: ActionPane(
-                                    motion: const ScrollMotion(),
-                                    children: [
-                                      SlidableAction(
-                                        // An action can be bigger than the others.
-                                        flex: 2,
-                                        icon: Icons.delete,
-                                        onPressed: (context) {
-                                          trip.delete(card.id);
-                                        },
-                                        backgroundColor:
-                                            const Color(0xFFFE4A49),
-                                        foregroundColor: Colors.white,
-                                      ),
-                                      SlidableAction(
-                                        flex: 2,
-                                        icon: Icons.thumb_up,
-                                        onPressed: (context) {
-                                          trip.like(card.id);
-                                        },
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        foregroundColor: Colors.white,
-                                      ),
-                                      SlidableAction(
-                                        flex: 2,
-                                        icon: Icons.thumb_down,
-                                        onPressed: (context) {
-                                          trip.dislike(card.id);
-                                        },
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        foregroundColor: Colors.white,
-                                      )
-                                    ],
-                                  ),
-                                  child: DraggableItem(
-                                    card: card,
-                                    child: CardItem(card),
-                                  ),
+                                return DraggableItem(
+                                  card: card,
+                                  child: CardItem(card),
                                 );
                               },
-                            ),
-                          );
-                        },
-                        childCount: trip.length,
-                      ));
-                    })
-                  ]),
-              resizeToAvoidBottomInset: false,
-              bottomNavigationBar: BottomAppBar(
-                height: 100 + MediaQuery.of(context).viewInsets.bottom,
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: const InputForm(),
-              ));
+                            );
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
+                              child: data.children.isNotEmpty
+                                  ? GroupItem(item)
+                                  : item,
+                            );
+                          },
+                          childCount: trip.length,
+                        ))
+                      ]),
+                  resizeToAvoidBottomInset: false,
+                  bottomNavigationBar: BottomAppBar(
+                    height: 100 + MediaQuery.of(context).viewInsets.bottom,
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: const InputForm(),
+                  ));
+            },
+          );
         });
   }
 }

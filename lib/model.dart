@@ -8,6 +8,7 @@ class TripModel extends ChangeNotifier {
 
   final grpc.TripClient stub;
   final String tripId;
+  bool _isEdit = false;
 
   TripModel(this.stub, this.tripId);
 
@@ -59,6 +60,15 @@ class TripModel extends ChangeNotifier {
 
   void moveTo(grpc.Card parent, grpc.Card child) {
     stub.moveCard(grpc.MoveCardRequest(tripId: tripId, cardId: child.id, from: null, to: parent.id));
+  }
+
+  void switchEditMode() {
+    _isEdit = !_isEdit;
+    notifyListeners();
+  }
+
+  bool isEditMode() {
+      return _isEdit;
   }
 }
 
