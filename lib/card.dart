@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
 
@@ -86,6 +85,7 @@ class _DraggableItemState extends State<DraggableItem> {
                 child: const Icon(
                   Icons.drag_indicator,
                   size: 20,
+                  color: Colors.white,
                 ),
               )
             : const SizedBox();
@@ -93,11 +93,12 @@ class _DraggableItemState extends State<DraggableItem> {
           icon = const Icon(
             Icons.add_circle,
             size: 20,
+            color: Colors.white,
           );
         }
         return Container(
-          decoration: const BoxDecoration(
-            color: Colors.black12,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.inverseSurface,
             borderRadius: BorderRadius.all(Radius.circular(4.0)),
           ),
           child: Row(
@@ -140,8 +141,10 @@ class GroupItem extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(4.0)),
-          border: Border.all(color: Theme.of(context).colorScheme.outline)),
+        color: Theme.of(context).colorScheme.surfaceVariant,
+        borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+        // border: Border.all(color: Theme.of(context).colorScheme.outline),
+      ),
       child: child,
     );
   }
@@ -162,25 +165,7 @@ class CardItemState extends State<CardItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          SlidableAction(
-            // An action can be bigger than the others.
-            flex: 2,
-            icon: Icons.delete,
-            onPressed: (context) {
-              context.read<TripModel>().delete(widget.card.id);
-            },
-            backgroundColor: const Color(0xFFFE4A49),
-            foregroundColor: Colors.white,
-          ),
-        ],
-      ),
-      child:
-          _isEditingMode ? buildEditState(context) : buildCommonState(context),
-    );
+    return _isEditingMode ? buildEditState(context) : buildCommonState(context);
   }
 
   Widget buildEditState(BuildContext context) {
@@ -204,8 +189,7 @@ class CardItemState extends State<CardItem> {
           style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.w400),
         ),
         Padding(
-          padding: const EdgeInsets.only(
-              left: 8, right: 8, bottom: 8, top: 8),
+          padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -222,8 +206,9 @@ class CardItemState extends State<CardItem> {
                 child: Text("Save"),
                 onPressed: () {
                   setState(() {
-                    context.read<TripModel>().updateText(
-                        widget.card.id, _editController.text);
+                    context
+                        .read<TripModel>()
+                        .updateText(widget.card.id, _editController.text);
                     _isEditingMode = false;
                   });
                 },
@@ -237,9 +222,13 @@ class CardItemState extends State<CardItem> {
 
   Widget buildCommonState(BuildContext context) {
     return Card(
-      elevation: 0.5,
+      elevation: 0.0,
+      color: Theme.of(context).colorScheme.surface,
       margin: EdgeInsets.zero,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.outline,
+        ),
         borderRadius: BorderRadius.all(Radius.circular(4)),
       ),
       child: Column(
@@ -286,7 +275,17 @@ class CardItemState extends State<CardItem> {
                             _isEditingMode = true;
                           });
                         },
-                        child: const Text("Edit"))
+                        child: const Text("edit v1")),
+                    MenuItemButton(
+                        onPressed: () {
+                          context.read<EditCardModel>().setCard(widget.card);
+                        },
+                        child: const Text("edit v2")),
+                    MenuItemButton(
+                        onPressed: () {
+                          context.read<TripModel>().delete(widget.card.id);
+                        },
+                        child: Text("delete"))
                   ],
                 ),
               )

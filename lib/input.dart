@@ -12,6 +12,7 @@ class InputForm extends StatefulWidget {
 
 class _InputFormState extends State<InputForm> {
   final myController = TextEditingController();
+  final focusNode = FocusNode();
   bool _hasText = false;
   double _padding = 0;
 
@@ -39,14 +40,31 @@ class _InputFormState extends State<InputForm> {
             },
             icon: const Icon(Icons.close))
         : const SizedBox(width: 0);
+
+    var model = context.read<EditCardModel>();
+    model.addListener(() {
+      if (model.card != null) {
+        var value = model.card!.text;
+        myController.text = value;
+        focusNode.requestFocus();
+        setState(() {
+          _hasText = value.isNotEmpty;
+          _padding = _hasText ? 48.0 + 8.0 : 0.0;
+        });
+      }
+    });
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Stack(alignment: AlignmentDirectional.center, children: [
         AnimatedPadding(
           padding: EdgeInsets.only(right: _padding),
           duration: const Duration(milliseconds: 250),
           child: TextField(
+            focusNode: focusNode,
             controller: myController,
+            minLines: 1,
+            maxLines: 100,
             onChanged: (value) {
               setState(() {
                 _hasText = value.isNotEmpty;

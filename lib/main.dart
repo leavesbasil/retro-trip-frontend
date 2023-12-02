@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:retro_trip/input.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
@@ -121,70 +120,84 @@ class TripPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (_) => TripModel.create(client, id),
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => TripModel.create(client, id)),
+          ChangeNotifierProvider(create: (_) => EditCardModel())
+        ],
         builder: (context, child) {
           return Consumer<TripModel>(
             builder: (_, trip, ___) {
               return Scaffold(
-                  appBar: AppBar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.inversePrimary,
-                    title: Text(id),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.copy),
-                        onPressed: () {
-                          Clipboard.setData(ClipboardData(text: id));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text(
-                                      "Идентификатор ретро скопирован в буфер")));
-                        },
+                appBar: AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  title: Text(id),
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: id));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    "Идентификатор ретро скопирован в буфер")));
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.repeat),
+                      selectedIcon: const Icon(Icons.repeat_on),
+                      isSelected: trip.isEditMode(),
+                      onPressed: () {
+                        trip.switchEditMode();
+                      },
+                    )
+                  ],
+                ),
+                body: Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            FocusScope.of(context)
+                                .unfocus(); // <-- Hide virtual keyboard
+                          },
+                          child: CustomScrollView(
+                              physics: const BouncingScrollPhysics(),
+                              slivers: [
+                                SliverList(
+                                    delegate: SliverChildBuilderDelegate(
+                                  (context, index) {
+                                    var data = trip.cards[index];
+                                    var item = HierarchicalItem(
+                                      card: data,
+                                      builder: (context, card) {
+                                        return DraggableItem(
+                                          card: card,
+                                          child: CardItem(card),
+                                        );
+                                      },
+                                    );
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 4.0, vertical: 2.0),
+                                      child: data.children.isNotEmpty
+                                          ? GroupItem(item)
+                                          : item,
+                                    );
+                                  },
+                                  childCount: trip.length,
+                                ))
+                              ]),
+                        ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.repeat),
-                        selectedIcon: const Icon(Icons.repeat_on),
-                        isSelected: trip.isEditMode(),
-                        onPressed: () {
-                          trip.switchEditMode();
-                        },
-                      )
+                      const InputForm()
                     ],
                   ),
-                  body: CustomScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      slivers: [
-                        SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            var data = trip.cards[index];
-                            var item = HierarchicalItem(
-                              card: data,
-                              builder: (context, card) {
-                                return DraggableItem(
-                                  card: card,
-                                  child: CardItem(card),
-                                );
-                              },
-                            );
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 2.0),
-                              child: data.children.isNotEmpty
-                                  ? GroupItem(item)
-                                  : item,
-                            );
-                          },
-                          childCount: trip.length,
-                        ))
-                      ]),
-                  resizeToAvoidBottomInset: false,
-                  bottomNavigationBar: BottomAppBar(
-                    height: 100 + MediaQuery.of(context).viewInsets.bottom,
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: const InputForm(),
-                  ));
+                ),
+                resizeToAvoidBottomInset: true,
+              );
             },
           );
         });

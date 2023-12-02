@@ -59,7 +59,8 @@ class TripModel extends ChangeNotifier {
   }
 
   void moveTo(grpc.Card parent, grpc.Card child) {
-    stub.moveCard(grpc.MoveCardRequest(tripId: tripId, cardId: child.id, from: null, to: parent.id));
+    stub.moveCard(grpc.MoveCardRequest(
+        tripId: tripId, cardId: child.id, from: null, to: parent.id));
   }
 
   void switchEditMode() {
@@ -68,7 +69,7 @@ class TripModel extends ChangeNotifier {
   }
 
   bool isEditMode() {
-      return _isEdit;
+    return _isEdit;
   }
 }
 
@@ -86,4 +87,15 @@ class TripClientFactory {
     final stub = grpc.TripClient(channel);
     return stub;
   }
+}
+
+class EditCardModel extends ChangeNotifier {
+  grpc.Card? _card;
+
+  setCard(grpc.Card card){
+      this._card = card;
+      notifyListeners();
+  }
+
+  grpc.Card? get card => _card;
 }
