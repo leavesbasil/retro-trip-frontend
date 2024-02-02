@@ -23,7 +23,7 @@ class RetroTripApp extends StatelessWidget {
         colorSchemeSeed: const Color(0xff6750a4),
         useMaterial3: true,
       ),
-      home: Provider<grpc.TripClient>(
+      home: Provider<grpc.RetroTripClient>(
         create: (_) => TripClientFactory.create(),
         builder: (context, child) {
           return StartPage();
@@ -59,9 +59,9 @@ class _StartPageState extends State<StartPage> {
                       fixedSize: const Size.fromWidth(250),
                     ),
                     onPressed: () {
-                      var stub = context.read<grpc.TripClient>();
+                      var stub = context.read<grpc.RetroTripClient>();
                       var response =
-                          stub.createTrip(grpc.CreateTripRequest(owner: 'iam'));
+                          stub.createTrip(grpc.CreateTripRequest(owner: 'iam', stageRequest: [grpc.StageRequest(name: "WELCOME")]));
                       response.then((p0) {
                         Navigator.push(
                           context,
@@ -78,7 +78,7 @@ class _StartPageState extends State<StartPage> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        var stub = context.read<grpc.TripClient>();
+                        var stub = context.read<grpc.RetroTripClient>();
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) {
@@ -114,7 +114,7 @@ class _StartPageState extends State<StartPage> {
 
 class TripPage extends StatelessWidget {
   final String id;
-  final grpc.TripClient client;
+  final grpc.RetroTripClient client;
 
   const TripPage(this.id, this.client, {super.key});
 

@@ -27,7 +27,13 @@ class _InputFormState extends State<InputForm> {
     var sendButton = _hasText
         ? IconButton.filled(
             onPressed: () {
-              context.read<TripModel>().add(myController.text);
+              var editContext = context.read<EditCardModel>();
+              var tripModel = context.read<TripModel>();
+              if (editContext.card != null) {
+                tripModel.updateText(editContext.card!.id, myController.text);
+              } else {
+                tripModel.add(myController.text);
+              }
               clearAndClose();
             },
             icon: const Icon(Icons.arrow_upward),

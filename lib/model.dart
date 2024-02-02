@@ -4,10 +4,12 @@ import 'package:grpc/grpc.dart';
 import 'package:retro_trip/src/generated/retro.pbgrpc.dart' as grpc;
 
 class TripModel extends ChangeNotifier {
-  List<grpc.Card> cards = [];
-
-  final grpc.TripClient stub;
+  final grpc.RetroTripClient stub;
   final String tripId;
+
+  int stageIndex = 0;
+  int roomIndex = 0;
+  List<grpc.Card> cards = [];
   bool _isEdit = false;
 
   TripModel(this.stub, this.tripId);
@@ -16,16 +18,18 @@ class TripModel extends ChangeNotifier {
 
   grpc.Card element(index) => cards.elementAt(index);
 
-  factory TripModel.create(grpc.TripClient client, String id) {
+  factory TripModel.create(grpc.RetroTripClient client, String id) {
     var result = TripModel(client, id);
     result.init();
     return result;
   }
 
   Future<void> init() async {
-    await for (var trip
-        in stub.tripStreaming(grpc.TripStreamingRequest(tripId: tripId))) {
-      cards = trip.card;
+    await for (var value
+        in stub.streamTrip(grpc.StreamTripRequest(tripId: tripId))) {
+      var trip = value.trip;
+      stageIndex = trip.currentStage;
+      cards = trip.stage[stageIndex].room[0].card;
       notifyListeners();
     }
   }
@@ -55,7 +59,7 @@ class TripModel extends ChangeNotifier {
   }
 
   void add(String text) {
-    stub.createCard(grpc.CreateCardRequest(tripId: tripId, text: text));
+    stub.createCard(grpc.CreateCardRequest(tripId: tripId, stageIndex: stageIndex, roomIndex: roomIndex, text: text));
   }
 
   void moveTo(grpc.Card parent, grpc.Card child) {
@@ -74,7 +78,7 @@ class TripModel extends ChangeNotifier {
 }
 
 class TripClientFactory {
-  static grpc.TripClient create() {
+  static grpc.RetroTripClient create() {
     final channel = ClientChannel(
       '192.168.1.106',
       port: 9090,
@@ -84,7 +88,7 @@ class TripClientFactory {
             CodecRegistry(codecs: const [GzipCodec(), IdentityCodec()]),
       ),
     );
-    final stub = grpc.TripClient(channel);
+    final stub = grpc.RetroTripClient(channel);
     return stub;
   }
 }
