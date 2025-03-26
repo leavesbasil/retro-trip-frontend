@@ -49,6 +49,10 @@ class RetroTripClient extends $grpc.Client {
       '/retro.api.v1.RetroTrip/MoveCard',
       ($0.MoveCardRequest value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.MoveCardReply.fromBuffer(value));
+  static final _$nextStage = $grpc.ClientMethod<$0.NextStageRequest, $0.NextStageReply>(
+      '/retro.api.v1.RetroTrip/NextStage',
+      ($0.NextStageRequest value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.NextStageReply.fromBuffer(value));
 
   RetroTripClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -82,6 +86,10 @@ class RetroTripClient extends $grpc.Client {
 
   $grpc.ResponseFuture<$0.MoveCardReply> moveCard($0.MoveCardRequest request, {$grpc.CallOptions? options}) {
     return $createUnaryCall(_$moveCard, request, options: options);
+  }
+
+  $grpc.ResponseFuture<$0.NextStageReply> nextStage($0.NextStageRequest request, {$grpc.CallOptions? options}) {
+    return $createUnaryCall(_$nextStage, request, options: options);
   }
 }
 
@@ -139,6 +147,13 @@ abstract class RetroTripServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.MoveCardRequest.fromBuffer(value),
         ($0.MoveCardReply value) => value.writeToBuffer()));
+    $addMethod($grpc.ServiceMethod<$0.NextStageRequest, $0.NextStageReply>(
+        'NextStage',
+        nextStage_Pre,
+        false,
+        false,
+        ($core.List<$core.int> value) => $0.NextStageRequest.fromBuffer(value),
+        ($0.NextStageReply value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.CreateTripReply> createTrip_Pre($grpc.ServiceCall call, $async.Future<$0.CreateTripRequest> request) async {
@@ -169,6 +184,10 @@ abstract class RetroTripServiceBase extends $grpc.Service {
     return moveCard(call, await request);
   }
 
+  $async.Future<$0.NextStageReply> nextStage_Pre($grpc.ServiceCall call, $async.Future<$0.NextStageRequest> request) async {
+    return nextStage(call, await request);
+  }
+
   $async.Future<$0.CreateTripReply> createTrip($grpc.ServiceCall call, $0.CreateTripRequest request);
   $async.Stream<$0.StreamTripReply> streamTrip($grpc.ServiceCall call, $0.StreamTripRequest request);
   $async.Future<$0.CreateCardReply> createCard($grpc.ServiceCall call, $0.CreateCardRequest request);
@@ -176,4 +195,5 @@ abstract class RetroTripServiceBase extends $grpc.Service {
   $async.Future<$0.UpdateCardReply> updateCard($grpc.ServiceCall call, $0.UpdateCardRequest request);
   $async.Future<$0.CardActionReply> cardAction($grpc.ServiceCall call, $0.CardActionRequest request);
   $async.Future<$0.MoveCardReply> moveCard($grpc.ServiceCall call, $0.MoveCardRequest request);
+  $async.Future<$0.NextStageReply> nextStage($grpc.ServiceCall call, $0.NextStageRequest request);
 }

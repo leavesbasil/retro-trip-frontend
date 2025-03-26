@@ -7,6 +7,7 @@ class TripModel extends ChangeNotifier {
   final grpc.RetroTripClient stub;
   final String tripId;
 
+  String currentStage = '';
   int stageIndex = 0;
   int roomIndex = 0;
   List<grpc.Card> cards = [];
@@ -15,6 +16,8 @@ class TripModel extends ChangeNotifier {
   TripModel(this.stub, this.tripId);
 
   get length => cards.length;
+
+  get name => currentStage;
 
   grpc.Card element(index) => cards.elementAt(index);
 
@@ -29,6 +32,7 @@ class TripModel extends ChangeNotifier {
         in stub.streamTrip(grpc.StreamTripRequest(tripId: tripId))) {
       var trip = value.trip;
       stageIndex = trip.currentStage;
+      currentStage = trip.stage[stageIndex].name;
       cards = trip.stage[stageIndex].room[0].card;
       notifyListeners();
     }
@@ -59,7 +63,11 @@ class TripModel extends ChangeNotifier {
   }
 
   void add(String text) {
-    stub.createCard(grpc.CreateCardRequest(tripId: tripId, stageIndex: stageIndex, roomIndex: roomIndex, text: text));
+    stub.createCard(grpc.CreateCardRequest(
+        tripId: tripId,
+        stageIndex: stageIndex,
+        roomIndex: roomIndex,
+        text: text));
   }
 
   void moveTo(grpc.Card parent, grpc.Card child) {
@@ -70,6 +78,17 @@ class TripModel extends ChangeNotifier {
   void switchEditMode() {
     _isEdit = !_isEdit;
     notifyListeners();
+  }
+
+  void nextStage() {
+    stub.nextStage(grpc.NextStageRequest(tripId: tripId));
+  }
+
+  void nextStageWithFunction(String transformer) {
+    stub.nextStage(grpc.NextStageRequest(
+      tripId: tripId,
+      function: [transformer],
+    ));
   }
 
   bool isEditMode() {
@@ -96,10 +115,14 @@ class TripClientFactory {
 class EditCardModel extends ChangeNotifier {
   grpc.Card? _card;
 
-  setCard(grpc.Card card){
-      this._card = card;
-      notifyListeners();
+  setCard(grpc.Card card) {
+    this._card = card;
+    notifyListeners();
   }
 
   grpc.Card? get card => _card;
+
+  void clear() {
+    _card = null;
+  }
 }

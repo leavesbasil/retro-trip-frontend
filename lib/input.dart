@@ -101,6 +101,7 @@ class _InputFormState extends State<InputForm> {
 
   void clearAndClose() {
     myController.clear();
+    context.read<EditCardModel>().clear();
     setState(() {
       _hasText = false;
       _padding = 0.0;

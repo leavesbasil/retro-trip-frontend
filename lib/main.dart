@@ -60,8 +60,12 @@ class _StartPageState extends State<StartPage> {
                     ),
                     onPressed: () {
                       var stub = context.read<grpc.RetroTripClient>();
-                      var response =
-                          stub.createTrip(grpc.CreateTripRequest(owner: 'iam', stageRequest: [grpc.StageRequest(name: "WELCOME")]));
+                      var response = stub.createTrip(grpc.CreateTripRequest(
+                        owner: 'iam',
+                        stageRequest: [
+                          grpc.StageRequest(name: "WELCOME"),
+                        ],
+                      ));
                       response.then((p0) {
                         Navigator.push(
                           context,
@@ -131,26 +135,43 @@ class TripPage extends StatelessWidget {
               return Scaffold(
                 appBar: AppBar(
                   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  automaticallyImplyLeading: false,
+                  leading: IconButton(
+                    icon: const Icon(Icons.copy),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: id));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content:
+                              Text("Идентификатор ретро скопирован в буфер"),
+                        ),
+                      );
+                    },
+                  ),
                   title: Text(id),
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.copy),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: id));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text(
-                                    "Идентификатор ретро скопирован в буфер")));
-                      },
+                  actions: <Widget>[
+                    PopupMenuButton<int>(
+                      itemBuilder: (context) => [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: Text('Настройки'),
+                          onTap: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Все уже настроено!"),
+                              ),
+                            );
+                          },
+                        ),
+                        PopupMenuItem<int>(
+                          value: 1,
+                          child: Text('Выход'),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.repeat),
-                      selectedIcon: const Icon(Icons.repeat_on),
-                      isSelected: trip.isEditMode(),
-                      onPressed: () {
-                        trip.switchEditMode();
-                      },
-                    )
                   ],
                 ),
                 body: Padding(
@@ -166,6 +187,45 @@ class TripPage extends StatelessWidget {
                           child: CustomScrollView(
                               physics: const BouncingScrollPhysics(),
                               slivers: [
+                                SliverAppBar(
+                                  automaticallyImplyLeading: false,
+                                  leading: IconButton(
+                                    icon: const Icon(Icons.drag_indicator),
+                                    selectedIcon: const Icon(Icons.cancel),
+                                    isSelected: trip.isEditMode(),
+                                    onPressed: () {
+                                      trip.switchEditMode();
+                                    },
+                                  ),
+                                  title: Text(trip.name),
+                                  actions: [
+                                    IconButton(
+                                      icon: const Icon(
+                                          Icons.keyboard_double_arrow_right),
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (ctx) {
+                                              return SimpleDialog(
+                                                  title: const Text(
+                                                      "Выбирите функцию перехода"),
+                                                  children: ['UPPERCASE', 'TOP3']
+                                                      .map((e) =>
+                                                          SimpleDialogOption(
+                                                            onPressed: () {
+                                                              trip.nextStageWithFunction(
+                                                                  e);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: Text(e),
+                                                          ))
+                                                      .toList());
+                                            });
+                                      },
+                                    ),
+                                  ],
+                                ),
                                 SliverList(
                                     delegate: SliverChildBuilderDelegate(
                                   (context, index) {

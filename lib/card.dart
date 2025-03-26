@@ -68,7 +68,9 @@ class _DraggableItemState extends State<DraggableItem> {
                     _isDragged = true;
                   });
                 },
-                onDragUpdate: (_) {},
+                onDragUpdate: (_) {
+
+                },
                 onDragEnd: (_) {
                   setState(() {
                     _isDragged = false;

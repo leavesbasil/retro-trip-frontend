@@ -13,6 +13,29 @@ import 'dart:convert' as $convert;
 import 'dart:core' as $core;
 import 'dart:typed_data' as $typed_data;
 
+@$core.Deprecated('Use nextStageRequestDescriptor instead')
+const NextStageRequest$json = {
+  '1': 'NextStageRequest',
+  '2': [
+    {'1': 'tripId', '3': 1, '4': 1, '5': 9, '10': 'tripId'},
+    {'1': 'function', '3': 2, '4': 3, '5': 9, '10': 'function'},
+  ],
+};
+
+/// Descriptor for `NextStageRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List nextStageRequestDescriptor = $convert.base64Decode(
+    'ChBOZXh0U3RhZ2VSZXF1ZXN0EhYKBnRyaXBJZBgBIAEoCVIGdHJpcElkEhoKCGZ1bmN0aW9uGA'
+    'IgAygJUghmdW5jdGlvbg==');
+
+@$core.Deprecated('Use nextStageReplyDescriptor instead')
+const NextStageReply$json = {
+  '1': 'NextStageReply',
+};
+
+/// Descriptor for `NextStageReply`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List nextStageReplyDescriptor = $convert.base64Decode(
+    'Cg5OZXh0U3RhZ2VSZXBseQ==');
+
 @$core.Deprecated('Use createTripRequestDescriptor instead')
 const CreateTripRequest$json = {
   '1': 'CreateTripRequest',
@@ -107,6 +130,7 @@ const Stage$json = {
     {'1': 'room', '3': 1, '4': 3, '5': 11, '6': '.retro.api.v1.Room', '10': 'room'},
     {'1': 'inFunction', '3': 2, '4': 3, '5': 9, '10': 'inFunction'},
     {'1': 'outFunction', '3': 3, '4': 3, '5': 9, '10': 'outFunction'},
+    {'1': 'name', '3': 4, '4': 1, '5': 9, '10': 'name'},
   ],
 };
 
@@ -114,7 +138,7 @@ const Stage$json = {
 final $typed_data.Uint8List stageDescriptor = $convert.base64Decode(
     'CgVTdGFnZRImCgRyb29tGAEgAygLMhIucmV0cm8uYXBpLnYxLlJvb21SBHJvb20SHgoKaW5GdW'
     '5jdGlvbhgCIAMoCVIKaW5GdW5jdGlvbhIgCgtvdXRGdW5jdGlvbhgDIAMoCVILb3V0RnVuY3Rp'
-    'b24=');
+    'b24SEgoEbmFtZRgEIAEoCVIEbmFtZQ==');
 
 @$core.Deprecated('Use roomDescriptor instead')
 const Room$json = {

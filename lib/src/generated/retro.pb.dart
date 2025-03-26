@@ -13,6 +13,96 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
+class NextStageRequest extends $pb.GeneratedMessage {
+  factory NextStageRequest({
+    $core.String? tripId,
+    $core.Iterable<$core.String>? function,
+  }) {
+    final $result = create();
+    if (tripId != null) {
+      $result.tripId = tripId;
+    }
+    if (function != null) {
+      $result.function.addAll(function);
+    }
+    return $result;
+  }
+  NextStageRequest._() : super();
+  factory NextStageRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory NextStageRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NextStageRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'retro.api.v1'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'tripId', protoName: 'tripId')
+    ..pPS(2, _omitFieldNames ? '' : 'function')
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  NextStageRequest clone() => NextStageRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  NextStageRequest copyWith(void Function(NextStageRequest) updates) => super.copyWith((message) => updates(message as NextStageRequest)) as NextStageRequest;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static NextStageRequest create() => NextStageRequest._();
+  NextStageRequest createEmptyInstance() => create();
+  static $pb.PbList<NextStageRequest> createRepeated() => $pb.PbList<NextStageRequest>();
+  @$core.pragma('dart2js:noInline')
+  static NextStageRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NextStageRequest>(create);
+  static NextStageRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get tripId => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set tripId($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTripId() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTripId() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.List<$core.String> get function => $_getList(1);
+}
+
+class NextStageReply extends $pb.GeneratedMessage {
+  factory NextStageReply() => create();
+  NextStageReply._() : super();
+  factory NextStageReply.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory NextStageReply.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NextStageReply', package: const $pb.PackageName(_omitMessageNames ? '' : 'retro.api.v1'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  NextStageReply clone() => NextStageReply()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  NextStageReply copyWith(void Function(NextStageReply) updates) => super.copyWith((message) => updates(message as NextStageReply)) as NextStageReply;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static NextStageReply create() => NextStageReply._();
+  NextStageReply createEmptyInstance() => create();
+  static $pb.PbList<NextStageReply> createRepeated() => $pb.PbList<NextStageReply>();
+  @$core.pragma('dart2js:noInline')
+  static NextStageReply getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NextStageReply>(create);
+  static NextStageReply? _defaultInstance;
+}
+
 class CreateTripRequest extends $pb.GeneratedMessage {
   factory CreateTripRequest({
     $core.String? owner,
@@ -403,6 +493,7 @@ class Stage extends $pb.GeneratedMessage {
     $core.Iterable<Room>? room,
     $core.Iterable<$core.String>? inFunction,
     $core.Iterable<$core.String>? outFunction,
+    $core.String? name,
   }) {
     final $result = create();
     if (room != null) {
@@ -414,6 +505,9 @@ class Stage extends $pb.GeneratedMessage {
     if (outFunction != null) {
       $result.outFunction.addAll(outFunction);
     }
+    if (name != null) {
+      $result.name = name;
+    }
     return $result;
   }
   Stage._() : super();
@@ -424,6 +518,7 @@ class Stage extends $pb.GeneratedMessage {
     ..pc<Room>(1, _omitFieldNames ? '' : 'room', $pb.PbFieldType.PM, subBuilder: Room.create)
     ..pPS(2, _omitFieldNames ? '' : 'inFunction', protoName: 'inFunction')
     ..pPS(3, _omitFieldNames ? '' : 'outFunction', protoName: 'outFunction')
+    ..aOS(4, _omitFieldNames ? '' : 'name')
     ..hasRequiredFields = false
   ;
 
@@ -456,6 +551,15 @@ class Stage extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(3)
   $core.List<$core.String> get outFunction => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.String get name => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set name($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasName() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearName() => clearField(4);
 }
 
 class Room extends $pb.GeneratedMessage {

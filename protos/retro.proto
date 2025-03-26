@@ -28,7 +28,16 @@ service RetroTrip {
   rpc UpdateCard (UpdateCardRequest) returns (UpdateCardReply) {}
   rpc CardAction (CardActionRequest) returns (CardActionReply) {}
   rpc MoveCard (MoveCardRequest) returns (MoveCardReply) {}
+
+  rpc NextStage(NextStageRequest) returns (NextStageReply) {}
 }
+
+message NextStageRequest {
+  string tripId = 1;
+  repeated string function = 2;
+}
+
+message NextStageReply {}
 
 message CreateTripRequest {
   string owner = 1;
@@ -69,6 +78,7 @@ message Stage {
   repeated Room room = 1;
   repeated string inFunction = 2;
   repeated string outFunction = 3;
+  string name = 4;
 }
 
 message Room {

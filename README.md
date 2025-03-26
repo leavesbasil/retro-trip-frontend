@@ -1,4 +1,4 @@
-# retro_trip
+# Retro Trip Client App
 
 Retro meeting app.
 
